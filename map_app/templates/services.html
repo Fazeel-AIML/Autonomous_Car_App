@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>{% block title %}Services | Autonomous Car Project{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'services.css' %}">
+</head>
+{% block content %}
+<body>
+    <header>
+        <h1>Services Provided by the Autonomous Car Project</h1>
+    </header>
+    <main>
+        <h2>Navigation Services</h2>
+        <p>Our autonomous car prototype offers efficient navigation between predefined points, leveraging advanced pathfinding algorithms and GPS for accurate location tracking.</p>
+
+        <h2>Obstacle Detection and Avoidance</h2>
+        <p>Using ultrasonic and infrared sensors, the car detects and avoids obstacles in real time, ensuring safety and efficiency during navigation.</p>
+
+        <h2>Live Monitoring</h2>
+        <p>The integrated Raspberry Pi camera streams live video of the car’s journey, providing users with real-time updates through cloud-based infrastructure.</p>
+
+        <h2>Cloud Integration</h2>
+        <p>Our IoT-enabled design allows for seamless remote monitoring and data management, ensuring scalability and adaptability for future enhancements.</p>
+
+        <h2>Educational and Research Opportunities</h2>
+        <p>The project serves as an excellent prototype for educational purposes, enabling students and researchers to explore autonomous vehicle technologies and IoT implementations.</p>
+    </main>
+</body>
+{% endblock %}  
+</html>

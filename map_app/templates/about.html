@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}About | Autonomous Car Project{% endblock %}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        main {
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+    </style>
+</head>
+{% block content %}
+<body>
+    <header>
+        <h1>About the Autonomous Car Project</h1>
+    </header>
+    <main>
+        <h2>Overview</h2>
+        <p>The Autonomous Car project is an innovative IoT-based initiative designed to create a small-scale autonomous car that navigates between predefined points while detecting and avoiding obstacles. The goal is to ensure a smooth and efficient journey through advanced pathfinding and real-time obstacle detection using ultrasonic and infrared sensors.</p>
+        
+        <h2>Technology Stack</h2>
+        <ul>
+            <li><strong>Hardware:</strong> GPS module (Neo6M V2 u-Blox), Raspberry Pi, L298N motor drivers, ultrasonic and infrared sensors.</li>
+            <li><strong>Software:</strong> Python, OpenCV, IoT cloud services for remote monitoring and data management.</li>
+            <li><strong>Connectivity:</strong> Real-time video streaming and sensor data via cloud integration.</li>
+        </ul>
+        
+        <h2>Features</h2>
+        <ul>
+            <li>Real-time obstacle detection and avoidance.</li>
+            <li>Precise location tracking with GPS.</li>
+            <li>Live video streaming of the car’s navigation path.</li>
+            <li>Cloud-based remote monitoring and control.</li>
+        </ul>
+        
+        <h2>Potential Applications</h2>
+        <p>This project can be utilized in:</p>
+        <ul>
+            <li>Smart transportation systems for optimized navigation.</li>
+            <li>Educational prototypes for autonomous vehicle research.</li>
+            <li>IoT-driven monitoring and surveillance systems.</li>
+        </ul>
+    </main>
+</body>
+{% endblock %}
+</html>

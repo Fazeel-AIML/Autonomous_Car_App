@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Autonomous Car Navigation System{% endblock %}</title>
+    {% load static %}
+    <!-- Mapbox CSS and JS -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js"></script>
+    <!-- Video.js Stylesheet -->
+    {% comment %} <link href="https://vjs.zencdn.net/8.21.1/video-js.min.css" rel="stylesheet"> {% endcomment %}
+    <!-- Video.js Script -->
+    {% comment %} <script src="https://vjs.zencdn.net/8.21.1/video.min.js"></script> {% endcomment %}
+    <link rel="stylesheet" href="{% static 'home.css' %}">
+</head>
+<body>
+    <header>
+        <!-- Navigation Bar -->
+        <nav>
+            <a href="{% url 'map_view' %}">Home</a>
+            <a href="{% url 'about' %}">About</a>
+            <a href="{% url 'contact' %}">Contact</a>
+            <a href="{% url 'services' %}">Services</a>
+        </nav>
+    </header>
+
+    {% block content %}
+    {% endblock %}
+
+    <footer>
+        <p>&copy; 2025 Autonomous Car Navigation System. All rights reserved.</p>
+    </footer>
+</body>
+</html>

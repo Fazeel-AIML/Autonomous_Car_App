@@ -1,0 +1,309 @@
+{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+   
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Home | Autonomous Car Project{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'home.css' %}">
+</head>
+{% block content %}
+<body>
+    
+    <main>
+        <h1>Autonomous Car Navigation System</h1>
+
+        <div class="container">
+            <!-- Map Container -->
+            <div class="map-container" id="map"></div>
+            <!-- Information Box -->
+            <div id="info-box">
+                <h3>Car Information</h3>
+                <p id="coordinates">Longitude: {{ longitude }} | Latitude: {{ latitude }}</p>
+                <p id="distance">Distance: Not calculated</p>
+                <p id="altitude">Altitude: {{ altitude }} meters</p>
+                <p id="speed">Speed: {{ speed }} km/h</p>
+                <p id="satellite">Satellite: {{ satellite }}</p>
+
+                <div id="movements">
+                    <h4>Movements:</h4>
+                    <ul id="movement-list"></ul>
+                </div>
+            </div>
+
+            {% comment %} <div class="video-container">
+                <img src="static/img.jpg" alt="Live Stream"  
+                     style="width: 130%; height: 120%; border-radius: 10px; object-fit: cover;">
+            </div> {% endcomment %}
+             <div class="video-container">
+                <img src="{% url 'video_feed' %}" alt="Live Stream" id="video_stream" 
+                     style="width: 130%; height: 120%; border-radius: 10px; object-fit: cover;">
+            </div> 
+        </div>
+    </main>
+
+    <script>
+    
+        // Mapbox Access Token
+        mapboxgl.accessToken = 'pk.eyJ1IjoiZmFzZ2hhcjQwIiwiYSI6ImNtMm9qcmZqYzBncWUyaXMzeGZoeXBjb2YifQ.mWuIsoppDibl4xwet2xQdw';
+    
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            center: [{{ longitude }}, {{ latitude }}],
+            zoom: 17
+        });
+    
+        const carMarker = new mapboxgl.Marker({ element: createCarElement() })
+            .setLngLat([{{ longitude }}, {{ latitude }}])
+            .addTo(map);
+    
+        let destination = null;
+        let movements = [];
+        let currentStepIndex = 0;
+        let carOrientation = 0;
+        let hasDownloadedMovements = false; // Flag to check if movements are downloaded
+    
+        map.on('click', handleMapClick);
+    
+        function createCarElement() {
+            const carElement = document.createElement('div');
+            carElement.className = 'car';
+            return carElement;
+        }
+    
+        function handleMapClick(event) {
+            const { lng, lat } = event.lngLat;
+            destination = [lng, lat];
+    
+            if (map.getLayer('destination-marker')) {
+                map.removeLayer('destination-marker');
+                map.removeSource('destination-marker');
+            }
+    
+            addDestinationMarker(destination);
+            calculateRoute();
+        }
+    
+        function addDestinationMarker(destination) {
+            map.addSource('destination-marker', {
+                type: 'geojson',
+                data: {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: destination
+                    }
+                }
+            });
+    
+            map.addLayer({
+                id: 'destination-marker',
+                type: 'circle',
+                source: 'destination-marker',
+                paint: {
+                    'circle-radius': 8,
+                    'circle-color': '#0074D9'
+                }
+            });
+        }
+    
+       
+    
+        async function calculateRoute() {
+            if (!destination) return;
+    
+            try {
+                const carPosition = carMarker.getLngLat();
+                const directionsUrl = `https://api.mapbox.com/directions/v5/mapbox/driving/${carPosition.lng},${carPosition.lat};${destination[0]},${destination[1]}?alternatives=false&geometries=geojson&steps=true&access_token=${mapboxgl.accessToken}`;
+                const response = await fetch(directionsUrl);
+                const data = await response.json();
+    
+                const routeGeoJSON = data.routes[0].geometry;
+                const distance = (data.routes[0].distance / 1000).toFixed(2);
+    
+                document.getElementById('distance').innerText = `Distance: ${distance} km`;
+                movements = data.routes[0].legs[0].steps;
+                displayMovements(movements);
+    
+                updateRouteLayer(routeGeoJSON);
+    
+                // Download movements once
+                if (!hasDownloadedMovements) {
+                    downloadMovementsAsText(movements);
+                    hasDownloadedMovements = true;  // Set flag to true after download
+                }
+            } catch (error) {
+                console.error('Error fetching route:', error);
+            }
+        }
+    
+        function displayMovements(steps) {
+            const movementList = document.getElementById('movement-list');
+            movementList.innerHTML = '';
+    
+            steps.forEach(step => {
+                const distance = step.distance.toFixed(2);
+                const maneuver = step.maneuver;
+                const modifier = maneuver.modifier || "";
+    
+                if (maneuver.type === 'turn' || maneuver.type === 'new name') {
+                    const turnInstruction = `Turn ${modifier.charAt(0).toUpperCase() + modifier.slice(1)} ${maneuver.bearing_after}`;
+                    const turnListItem = document.createElement('li');
+                    turnListItem.textContent = turnInstruction;
+                    movementList.appendChild(turnListItem);
+                }
+    
+                if (distance > 0) {
+                    const moveInstruction = `Move Forward ${distance} meters`;
+                    const moveListItem = document.createElement('li');
+                    moveListItem.textContent = moveInstruction;
+                    movementList.appendChild(moveListItem);
+                }
+            });
+        }
+    
+        function updateRouteLayer(routeGeoJSON) {
+            if (map.getLayer('route-layer')) {
+                map.removeLayer('route-layer');
+                map.removeSource('route-layer');
+            }
+    
+            map.addSource('route-layer', {
+                type: 'geojson',
+                data: {
+                    type: 'Feature',
+                    geometry: routeGeoJSON
+                }
+            });
+    
+            map.addLayer({
+                id: 'route-layer',
+                type: 'line',
+                source: 'route-layer',
+                paint: {
+                    'line-color': '#FF4136',
+                    'line-width': 4
+                }
+            });
+        }
+    
+        function downloadMovementsAsText(steps) {
+            const movementsText = steps.map(step => {
+                const distance = step.distance.toFixed(2);
+                const maneuver = step.maneuver;
+                const modifier = maneuver.modifier || "";
+    
+                let instruction = "";
+    
+                if (maneuver.type === 'turn' || maneuver.type === 'new name') {
+                    instruction = `Turn ${modifier.charAt(0).toUpperCase() + modifier.slice(1)} ${maneuver.bearing_after}`;
+                }
+    
+                if (distance > 0) {
+                    instruction += instruction ? ` ,Move Forward ${distance} meters` : `Move Forward ${distance} meters`;
+                }
+    
+                return instruction;
+            }).join(' ,');
+    
+            const blob = new Blob([movementsText], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'movements.txt';
+            link.click();
+        }
+        async function updateCoordinates() {
+            console.log("Fetching GPS data..."); // Debugging statement
+        
+            try {
+                const response = await fetch(`/api/gps-data/?t=${new Date().getTime()}`);
+                if (!response.ok) throw new Error("Failed to fetch GPS data");
+        
+                const data = await response.json();
+                console.log("Received GPS Data:", data); // Debugging statement
+        
+                const newLongitude = parseFloat(data.longitude);
+                const newLatitude = parseFloat(data.latitude);
+                const newSpeed = parseFloat(data.speed);
+                const newAltitude = parseFloat(data.altitude);
+                const newTime = data.time;  
+                const newSatellite = parseFloat(data.satellite);
+        
+                if (typeof carMarker !== "undefined") {
+                    carMarker.setLngLat([newLongitude, newLatitude]);
+                }
+        
+                updateCoordinateInfo(newLongitude, newLatitude);
+                updateSpeedInfo(newSpeed);
+                updateAltitudeInfo(newAltitude);
+                {% comment %} TimeInfo(newTime); {% endcomment %}
+                SatelliteInfo(newSatellite);
+        
+                if (typeof destination !== "undefined" && destination) {
+                    calculateRoute();
+                }
+            } catch (error) {
+                console.error('Error fetching coordinates:', error);
+            }
+        }
+        function updateCoordinateInfo(newLongitude, newLatitude) {
+            console.log(`Updated Coordinates: Longitude - ${newLongitude}, Latitude - ${newLatitude}`);
+            document.getElementById("coordinates").innerText = `Longitude: ${newLongitude}, Latitude: ${newLatitude}`;
+        }
+        
+        function updateSpeedInfo(newSpeed) {
+            console.log(`Updated Speed: ${newSpeed} km/h`);
+            document.getElementById("speed").innerText = `Speed: ${newSpeed} km/h`;
+        }
+        
+        function updateAltitudeInfo(newAltitude) {
+            console.log(`Updated Altitude: ${newAltitude} meters`);
+            document.getElementById("altitude").innerText = `Altitude: ${newAltitude} meters`;
+        }
+        
+        function TimeInfo(newTime) {
+            console.log(`Updated Time: ${newTime}`);
+            document.getElementById("time").innerText = `Time: ${newTime}`;
+        }
+        
+        function SatelliteInfo(newSatellite) {
+            console.log(`Updated Satellite Count: ${newSatellite}`);
+            document.getElementById("satellite").innerText = `Satellites: ${newSatellite}`;
+        }
+        
+                // Refresh Video Stream Efficiently
+        function refreshVideoStream() {
+            const video = document.getElementById('video-stream');
+            video.src = "{% url 'video_feed' %}?" + new Date().getTime(); // Prevent caching
+        }
+
+        // Start Video Stream with Error Handling
+        function startStream() {
+            const videoElement = document.getElementById("video-stream");
+
+            function connectStream() {
+                videoElement.src = "{% url 'video_feed' %}";
+
+                videoElement.onerror = function () {
+                    console.error("Stream connection lost. Retrying...");
+                    setTimeout(connectStream, 2000); // Retry after 2 seconds
+                };
+            }
+
+            connectStream();
+        }
+setInterval(updateCoordinates, 2000);
+        document.addEventListener("DOMContentLoaded", () => {
+            console.log("Page loaded, starting streams..."); // Debugging statement
+        
+            startStream();
+            setInterval(refreshVideoStream, 500); // Refresh video every 500ms
+             });
+    </script>
+    
+</body>
+{% endblock %}
+</html>

@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> {% block title %}Contact | Autonomous Car Project {% endblock %}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        main {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        section {
+            margin-bottom: 20px;
+        }
+        .contact-info {
+            padding: 10px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            background: #333;
+            color: #fff;
+            margin-top: 20px;
+        }
+        .contact-item {
+            margin-bottom: 10px;
+        }
+        .contact-item strong {
+            color: #555;
+        }
+    </style>
+</head>
+{% block content %}
+<body>
+    <header>
+        <h1>Contact Us</h1>
+    </header>
+    <main>
+        <section>
+            <h2>About the Project Partners</h2>
+            <div class="contact-info">
+                <p class="contact-item">
+                    <strong>Fazeel Asghar</strong> (Project Lead) <br>
+                    <strong>Email:</strong> fasghar40@gmail.com <br>
+                    <strong>Phone:</strong> 03126690033 <br>
+                    <strong>Address:</strong> Khanpur Katora, Rahimyarkhan
+                </p>
+                <p class="contact-item">
+                    <strong>Nouman Masood</strong> <br>
+                    <strong>Email:</strong> nouman@example.com <br>
+                    <strong>Phone:</strong> 03120000000 <br>
+                    <strong>Address:</strong> Street 123, City XYZ, Dummy State
+                </p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Project Supervisor</h2>
+            <div class="contact-info">
+                <p class="contact-item">
+                    <strong>Dr. Omer Riaz</strong> <br>
+                    <strong>Designation:</strong> Project Supervisor
+                </p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Reach Out to Us</h2>
+            <p>If you have any queries regarding our Autonomous Car Project, feel free to contact us directly through the information provided above.</p>
+        </section>
+    </main>
+    {% endblock %}
+</body>
+</html>
