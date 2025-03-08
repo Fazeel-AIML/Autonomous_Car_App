@@ -19,53 +19,75 @@ h1 {
 .container {
     margin: 0px;
     display: flex;
-    padding: 20px;
     width: 1300px;
-    justify-content: space-between;
-    flex-direction: column;
+    
+    flex-direction: row;
     height: 600px;
     flex-wrap: wrap; /* Allows responsive layout */
 }
 
+/* 3D Aesthetic Video Container */
 .video-container {
     width: 40%;
-    height: 500px;
+    margin-left: 100px;
+    height: 70%;
     box-sizing: border-box;
-    border-radius: 10px;
-    background-color: #1a1a1a;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+    background: linear-gradient(145deg, #1c1c1c, #2a2a2a); /* Smooth gradient for depth */
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.6), -10px -10px 20px rgba(50, 50, 50, 0.3); /* Deep 3D shadow */
     animation: fadeIn 1.5s ease-out;
     overflow: hidden; /* Ensures border-radius applies correctly */
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: all 0.3s ease-in-out;
+    border: 3px solid rgba(255, 255, 255, 0.05);
+    position: relative;
 }
 
+/* 3D Effect on Hover */
+.video-container:hover {
+    box-shadow: 12px 12px 24px rgba(0, 0, 0, 0.7), -12px -12px 24px rgba(50, 50, 50, 0.4);
+    transform: scale(1.03);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Glowing Neon Border Effect */
+.video-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(0, 102, 255, 0.3), rgba(255, 0, 102, 0.3));
+    opacity: 0.5;
+    filter: blur(10px);
+    z-index: -1;
+}
+
+/* Video Image Styling */
 .video-container img {
     width: 100%;
     height: 100%;
     object-fit: cover; /* Ensures the image fills the container while keeping aspect ratio */
-    border-radius: 10px; /* Applies rounded corners to the image */
-}
-.video-container {
-    width: 40%;
-    height: 500px;
-    box-sizing: border-box;
-    border-radius: 10px;
-    background-color: #1a1a1a;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    animation: fadeIn 1.5s ease-out;
-    overflow: hidden; /* Ensures border-radius applies correctly */
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    border-radius: 15px; /* Applies smooth rounded corners */
+    transition: transform 0.3s ease-in-out;
 }
 
-.video-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Ensures the image fills the container while keeping aspect ratio */
-    border-radius: 50px; /* Applies rounded corners to the image */
+/* Hover Effect on Image */
+.video-container:hover img {
+    transform: scale(1.05);
+}
+
+/* Smooth fade-in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Navigation Bar */
@@ -93,79 +115,183 @@ nav a:hover {
 }
 
 
+/* 3D Aesthetic Map Container */
 .map-container {
-    width: 40%;
-    height: 100%;
-    padding-right: 40px;
+    width: 50%;
+    height: 60%;
+    padding: 20px;
     box-sizing: border-box;
-    border-radius: 10px;
-    background-color: #1a1a1a; /* Darker background for map container */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    animation: fadeIn 1.5s ease-out; /* Fade-in effect for map container */
+    border-radius: 20px;
+    background: linear-gradient(145deg, #1a1a1a, #2e2e2e); /* Deep gradient for boxy depth */
+    box-shadow: 12px 12px 24px rgba(0, 0, 0, 0.6), -12px -12px 24px rgba(50, 50, 50, 0.3); /* Stronger 3D shadow */
+    animation: fadeIn 1.5s ease-out;
+    transition: all 0.3s ease-in-out;
+    border: 3px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Map container styling */
+/* 3D Map Styling */
 #map {
     width: 40%;
-    height: 80%;
-    padding-right: 70px;
-    border: 2px solid #0074D9;
-    border-radius: 10px;
-    background-color: #1a1a1a; /* Dark background for map */
+    height: 70%;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #202020, #383838); /* Smooth metallic gradient */
+    box-shadow: inset 6px 6px 12px rgba(0, 0, 0, 0.5), inset -6px -6px 12px rgba(50, 50, 50, 0.3);
+    border: 3px solid #0074D9;
+    position: relative;
+    overflow: hidden;
 }
 
-/* Styling for the car marker */
+/* 3D Car Marker */
 .car {
-    width: 40px;
-    height: 20px;
-    background-color: #FF4136;
-    border-radius: 5px;
+    width: 50px;
+    height: 25px;
+    background: linear-gradient(145deg, #FF4136, #C72C2C); /* Deeper red gradient for a premium look */
+    border-radius: 10px;
     transform: translate(-50%, -50%);
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    position: absolute;
 }
 
-/* Information Box styling */
+/* Glowing Hover Effect */
+.map-container:hover {
+    box-shadow: 14px 14px 28px rgba(0, 0, 0, 0.7), -14px -14px 28px rgba(50, 50, 50, 0.4);
+    transform: scale(1.03);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Smooth fade-in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* Car Info Box Overlaid on Map (Smaller & Sleeker) */
 #info-box {
-    background-color: #2c3e50; /* Dark blue-gray for the info box */
-    margin-left: 10px;
-    margin-right: 10px;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    font-size: 14px;
-    color: #ecf0f1; /* Light text for readability */
-    animation: fadeIn 2s ease-out; /* Fade-in effect for info box */
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 150px; /* Slightly wider for readability */
+    background: rgba(44, 62, 80, 0.85);
+    padding: 12px;
+    border-radius: 6px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    font-size: 12px;
+    color: #ecf0f1;
+    animation: fadeIn 1.5s ease-out;
+    z-index: 1000;
+    transition: all 0.3s ease-in-out;
+    max-height: 200px;  /* Restrict height */
+    overflow-y: auto;  /* Enable scrolling */
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: #1b2836 #2c3e50;
 }
 
+/* Scrollbar Styling for Webkit Browsers (Chrome, Safari) */
+#info-box::-webkit-scrollbar {
+    width: 5px;
+}
+
+#info-box::-webkit-scrollbar-thumb {
+    background: #2b3f53;
+    border-radius: 4px;
+}
+
+#info-box::-webkit-scrollbar-track {
+    background: #1b2836;
+}
+
+/* Hover Effect */
+#info-box:hover {
+    transform: scale(1.05);
+    background: rgba(44, 62, 80, 0.95);
+}
+
+/* Title Styling (Slightly Smaller) */
 #info-box h3 {
-    margin: 0 0 10px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #fff;
-}
-
-#info-box p {
-    margin: 5px 0;
+    margin: 0 0 8px;
     font-size: 14px;
-    color: #bbb;
+    font-weight: bold;
+    color: #ffffff;
 }
 
+/* Car Info Text */
+#info-box p {
+    margin: 3px 0;
+    font-size: 12px;
+    color: #d1d7dc;
+}
+
+/* Movements Section */
 #movements {
-    margin-top: 10px;
+    margin-top: 8px;
 }
 
+/* List Styling (More Compact) */
 #movement-list {
     list-style-type: none;
     padding-left: 0;
+    max-height: 120px; /* Set max height for scrolling */
+    overflow-y: auto; /* Allow scrolling */
 }
 
-#movement-list li {
-    margin-bottom: 8px;
+/* List Scrollbar */
+#movement-list::-webkit-scrollbar {
+    width: 4px;
 }
+
+#movement-list::-webkit-scrollbar-thumb {
+    background: #3b4d5f;
+    border-radius: 3px;
+}
+
+#movement-list::-webkit-scrollbar-track {
+    background: #1b2836;
+}
+
+/* List Item Styling */
+#movement-list li {
+    margin-bottom: 5px;
+    padding: 5px;
+    border-radius: 5px;
+    background: linear-gradient(145deg, #253545, #1b2836);
+    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.3), inset -1px -1px 3px rgba(50, 50, 50, 0.2);
+    color: #d1d7dc;
+    font-size: 11px;
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Hover effect for list items */
+#movement-list li:hover {
+    transform: scale(1.03);
+    background: linear-gradient(145deg, #2b3f53, #22323f);
+}
+
+
+/* Smooth fade-in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 
 /* Styling for the video player */
 #my-video {
     padding: 20px;
-    width: 100%;
+    width: 80%;
     height: 80%;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);

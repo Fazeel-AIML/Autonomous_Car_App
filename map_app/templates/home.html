@@ -14,35 +14,32 @@
     
     <main>
         <h1>Autonomous Car Navigation System</h1>
-
+    
         <div class="container">
-            <!-- Map Container -->
-            <div class="map-container" id="map"></div>
-            <!-- Information Box -->
-            <div id="info-box">
-                <h3>Car Information</h3>
-                <p id="coordinates">Longitude: {{ longitude }} | Latitude: {{ latitude }}</p>
-                <p id="distance">Distance: Not calculated</p>
-                <p id="altitude">Altitude: {{ altitude }} meters</p>
-                <p id="speed">Speed: {{ speed }} km/h</p>
-                <p id="satellite">Satellite: {{ satellite }}</p>
-
-                <div id="movements">
-                    <h4>Movements:</h4>
-                    <ul id="movement-list"></ul>
+            <!-- Map Container with Overlaid Car Info -->
+            <div class="map-container" id="map">
+                <div id="info-box">
+                    <h3>Car Information</h3>
+                    <p id="coordinates">Longitude: {{ longitude }} | Latitude: {{ latitude }}</p>
+                    <p id="distance">Distance: Not calculated</p>
+                    <p id="altitude">Altitude: {{ altitude }} meters</p>
+                    <p id="speed">Speed: {{ speed }} km/h</p>
+                    <p id="satellite">Satellite: {{ satellite }}</p>
+    
+                    <div id="movements">
+                        <h4>Movements:</h4>
+                        <ul id="movement-list"></ul>
+                    </div>
                 </div>
             </div>
-
-            {% comment %} <div class="video-container">
-                <img src="static/img.jpg" alt="Live Stream"  
-                     style="width: 130%; height: 120%; border-radius: 10px; object-fit: cover;">
-            </div> {% endcomment %}
-             <div class="video-container">
-                <img src="{% url 'video_feed' %}" alt="Live Stream" id="video_stream" 
-                     style="width: 130%; height: 120%; border-radius: 10px; object-fit: cover;">
-            </div> 
+    
+            <!-- Video Feed -->
+            <div class="video-container">
+                <img src="{% url 'video_feed' %}" alt="Live Stream" id="video_stream">
+            </div>
         </div>
     </main>
+    
 
     <script>
     
@@ -150,14 +147,37 @@
                 const modifier = maneuver.modifier || "";
     
                 if (maneuver.type === 'turn' || maneuver.type === 'new name') {
-                    const turnInstruction = `Turn ${modifier.charAt(0).toUpperCase() + modifier.slice(1)} ${maneuver.bearing_after}`;
-                    const turnListItem = document.createElement('li');
-                    turnListItem.textContent = turnInstruction;
-                    movementList.appendChild(turnListItem);
+                    const turnAngle = Math.abs((maneuver.bearing_after - maneuver.bearing_before + 360) % 360);
+                    const adjustedTurnAngle = turnAngle > 180 ? 360 - turnAngle : turnAngle;  // Convert to 0-180 range
+                
+                    // Instead of scaling to 90° directly, use a non-linear mapping for better sensitivity
+                    let scaledTurnAngle;
+                    if (adjustedTurnAngle < 15) {
+                        scaledTurnAngle = 0;  // Ignore very small changes
+                    } else if (adjustedTurnAngle < 45) {
+                        scaledTurnAngle = adjustedTurnAngle / 2;  // Smooth turn, lower sensitivity
+                    } else {
+                        scaledTurnAngle = Math.min(adjustedTurnAngle, 90);  // Sharper turns
+                    }
+                
+                    if (scaledTurnAngle >= 10) {  // Ignore very slight curves
+                        const turnInstruction = `Turn ${modifier.charAt(0).toUpperCase() + modifier.slice(1)} ${scaledTurnAngle.toFixed(2)}°`;
+                        
+                        const turnListItem = document.createElement('li');
+                        turnListItem.textContent = turnInstruction;
+                        movementList.appendChild(turnListItem);
+                    }
                 }
+                
+                
     
                 if (distance > 0) {
-                    const moveInstruction = `Move Forward ${distance} meters`;
+                    let moveInstruction;
+                    if (maneuver.modifier === 'uturn' || maneuver.type === 'turn' && Math.abs(maneuver.bearing_after - maneuver.bearing_before) > 150) {
+                        moveInstruction = `Move Backward ${distance} meters`;
+                    } else {
+                        moveInstruction = `Move Forward ${distance} meters`;
+                    }
                     const moveListItem = document.createElement('li');
                     moveListItem.textContent = moveInstruction;
                     movementList.appendChild(moveListItem);
@@ -195,26 +215,41 @@
                 const distance = step.distance.toFixed(2);
                 const maneuver = step.maneuver;
                 const modifier = maneuver.modifier || "";
-    
+                
                 let instruction = "";
-    
+        
                 if (maneuver.type === 'turn' || maneuver.type === 'new name') {
-                    instruction = `Turn ${modifier.charAt(0).toUpperCase() + modifier.slice(1)} ${maneuver.bearing_after}`;
+                    const turnAngle = Math.abs((maneuver.bearing_after - maneuver.bearing_before + 360) % 360);
+                    const adjustedTurnAngle = turnAngle > 180 ? 360 - turnAngle : turnAngle; // Convert to 0-180 range
+                    
+                    let scaledTurnAngle;
+                    if (adjustedTurnAngle < 15) {
+                        scaledTurnAngle = 0;  // Ignore very small changes
+                    } else if (adjustedTurnAngle < 45) {
+                        scaledTurnAngle = adjustedTurnAngle / 2;  // Smooth turn, lower sensitivity
+                    } else {
+                        scaledTurnAngle = Math.min(adjustedTurnAngle, 90);  // Sharper turns
+                    }
+                    
+                    if (scaledTurnAngle >= 10) {  // Ignore very slight curves
+                        instruction = `Turn ${modifier.charAt(0).toUpperCase() + modifier.slice(1)} ${scaledTurnAngle.toFixed(2)}°`;
+                    }
                 }
-    
+        
                 if (distance > 0) {
                     instruction += instruction ? ` ,Move Forward ${distance} meters` : `Move Forward ${distance} meters`;
                 }
-    
+        
                 return instruction;
-            }).join(' ,');
-    
+            }).filter(instruction => instruction).join(' ,'); // Remove empty instructions
+        
             const blob = new Blob([movementsText], { type: 'text/plain' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = 'movements.txt';
             link.click();
         }
+        
         async function updateCoordinates() {
             console.log("Fetching GPS data..."); // Debugging statement
         

@@ -61,12 +61,12 @@ class EC2Connection:
         try:
             current_hash = get_file_hash(local_path)
             if current_hash == last_movements_hash:
-                # logger.info("No changes detected in movements.txt. Skipping upload.")
+                logger.info("No changes detected in movements.txt. Skipping upload.")
                 return
             
             self.sftp_client.put(local_path, remote_path)
             last_movements_hash = current_hash
-            os.remove(local_path)
+            # os.remove(local_path)
             # logger.info(f"Uploaded {local_path} to EC2 and deleted local copy.")
         except Exception as e:
             logger.error(f"Error uploading file: {e}")

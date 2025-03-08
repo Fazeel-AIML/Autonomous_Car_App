@@ -48,10 +48,6 @@ def services(request):
 
 def contact(request):
     return render(request, 'contact.html')
-import cv2
-import time
-from collections import deque
-from django.http import StreamingHttpResponse
 
 import subprocess
 import cv2
@@ -61,13 +57,15 @@ from collections import deque
 from django.http import StreamingHttpResponse
 
 def video_stream():
-    rtmp_url = "rtmp://54.90.141.3/live/stream"
-    
+    rtmp_url = "rtmp://174.129.72.234/live/stream"
+
     def open_stream():
         """Keep trying to open the RTMP stream indefinitely."""
         retries = 0
         while True:
             cap = cv2.VideoCapture(rtmp_url)
+            # Set buffer size to 512KB (512 * 1024 bytes)
+            #cap.set(cv2.CAP_PROP_BUFFERSIZE, 512 * 1024)
             if cap.isOpened():
                 print("Connected to stream.")
                 return cap
@@ -80,13 +78,15 @@ def video_stream():
 
     while True:
         success, frame = cap.read()
+
         if not success:
-            print("Stream lost. Reconnecting...")
+            print("Stream lost. Attempting reconnection...")
             cap.release()
             cap = open_stream()
-            continue
+            continue  # Skip this iteration and retry reading
 
         frame_buffer.append(frame)
+
         if frame_buffer:
             _, buffer = cv2.imencode('.jpg', frame_buffer[-1], [cv2.IMWRITE_JPEG_QUALITY, 80])
             frame_bytes = buffer.tobytes()
@@ -96,7 +96,6 @@ def video_stream():
                    b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
 
     cap.release()  # Cleanup when exiting (unlikely to reach)
-
 
 def stream_view(request):
     return StreamingHttpResponse(video_stream(), content_type='multipart/x-mixed-replace; boundary=frame')
